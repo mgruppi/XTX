@@ -39,7 +39,7 @@ class LMActorCriticAgent:
     ):
         self.gamma = args.gamma
         self.batch_size = args.batch_size
-        self.tokenizer = SentenceTokenizer(model_name)
+        self.tokenizer = SentenceTokenizer(model_name, device)
         self.text_encoder = SentenceEncoder(model_name, device)
         args.drrn_embedding_dim = 768  # Override default dim for now
         self.network = LMActorCriticQNetwork(
