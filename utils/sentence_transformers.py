@@ -46,11 +46,12 @@ def normalize(x):
 
 
 class Tokenizer():
-    def __init__(self, model_name):
+    def __init__(self, model_name, device):
+        self.device = device
         self.model = AutoTokenizer.from_pretrained(model_name)
     
     def encode(self, batch):
-        return self.model(batch, padding=True, truncation=True, return_tensors='pt')
+        return self.model(batch, padding=True, truncation=True, return_tensors='pt').to(self.device)
         
 
 class Encoder():
