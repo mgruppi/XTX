@@ -63,6 +63,7 @@ class Encoder():
             compute_gradient (bool) : If False, model is put in eval mode.
         """
         self.model = AutoModel.from_pretrained(model_name).to(device)
+        self.device = device
         if not compute_gradients:
             self.model.eval()
     

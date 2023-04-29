@@ -155,7 +155,7 @@ def packed_rnn(model, x, rnn):
         return packed_hash(model, x)
 
 
-    embed = torch.cat([model.text_encoder.encode(x_i) for x_i in x])
+    embed = torch.cat([model.text_encoder.encode(x_i) for x_i in x]).to(device)
     embed = embed.unsqueeze(0)  # Add dimension so that we have 1 x batch size x EmbedDim
     out, _ = rnn(embed)
     out = out.squeeze(0)
