@@ -13,13 +13,15 @@ import wandb
 from agents import (
     DrrnAgent,
     DrrnInvDynAgent,
-    DrrnGraphInvDynAgent
+    DrrnGraphInvDynAgent,
+    LMActorCriticAgent
 )
 
 from trainers import (
     DrrnTrainer,
     DrrnInvDynTrainer,
-    DrrnGraphInvDynTrainer
+    DrrnGraphInvDynTrainer,
+    LMActorCriticTrainer
 )
 
 from transformers import GPT2LMHeadModel, GPT2Config
@@ -271,7 +273,12 @@ def main():
     ]
 
     # Setup rl model
-    if args.model_name == defs.DRRN:
+    if args.model_name == defs.LM_AC:
+        envs = VecEnv(args.num_envs, eval_env)
+        agent = LMActorCriticAgent(tb, log, args, envs, None)
+        trainer = LMActorCriticTrainer(tb, log, agent, envs, eval_env, args)
+    
+    elif args.model_name == defs.DRRN:
         assert args.use_action_model == 0, "'use_action_model' needs to be OFF"
         assert args.r_for == 0, "r_for needs to be zero when NOT using inverse dynamics."
         assert args.use_il == 0, "no il should be used when running DRRN."

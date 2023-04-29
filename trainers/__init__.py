@@ -2,3 +2,4 @@ from trainers.trainer import Trainer
 from trainers.drrn.drrn_trainer import DrrnTrainer
 from trainers.drrn.drrn_inv_dyn_trainer import DrrnInvDynTrainer
 from trainers.drrn.drrn_graph_inv_dyn_trainer import DrrnGraphInvDynTrainer
+from trainers.lm_actor_critic.lm_actor_critic_trainer import LMActorCriticTrainer

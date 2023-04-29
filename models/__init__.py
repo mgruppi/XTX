@@ -1,2 +1,3 @@
 from models.drrn.drrn import DrrnQNetwork
 from models.drrn.drrn_inv_dyn import DrrnInvDynQNetwork
+from models.lm_actor_critic.lm_actor_critic import LMActorCriticQNetwork
