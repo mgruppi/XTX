@@ -14,6 +14,8 @@ import utils.lm_actor_critic as AC
 from utils.memory import State, StateWithActs
 from utils.env import JerichoEnv
 
+import time
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -44,15 +46,20 @@ class LMActorCriticQNetwork(nn.Module):
 
     def forward(self, state_batch, act_batch):
 
+        time_total = time.time()
+
         # Zip the state_batch into an easy access format
         if self.use_action_model:
             state = StateWithActs(*zip(*state_batch))
         else:
             state = State(*zip(*state_batch))
+
+        time_enc_act = time.time()
         act_sizes = [len(a) for a in act_batch]
         # Combine next actions into one long list
         act_batch = list(itertools.chain.from_iterable(act_batch))
         act_out = AC.packed_rnn(self, act_batch, self.act_encoder)
+        time_enc_act = time.time() - time_enc_act
         # act_out is a n_actions X embedding dim tensor
 
         # Encode the various aspects of the state
@@ -60,11 +67,15 @@ class LMActorCriticQNetwork(nn.Module):
         # Obs, description inv and act are already tokenized
         # state.obs is an n_batches x L size tuple of lists
         # obs_out is an n_batches X embedding_dim tensor
+        time_enc_obs = time.time()
         obs_out = AC.packed_rnn(self, state.obs, self.obs_encoder)
+        time_enc_obs = time.time() - time_enc_obs
+        time_enc_look = time.time()
         look_out = AC.packed_rnn(self, state.description, self.look_encoder)
+        time_enc_look = time.time() - time_enc_look
+        time_enc_inv = time.time()
         inv_out = AC.packed_rnn(self, state.inventory, self.inv_encoder)
-
-        print("OBS", obs_out.shape, "LOOK", look_out.shape, "INV", inv_out.shape)
+        time_enc_inv = time.time() - time_enc_inv
 
         state_out = torch.cat((obs_out, look_out, inv_out), dim=1)
         # Expand the state to match the batches of actions
@@ -75,6 +86,14 @@ class LMActorCriticQNetwork(nn.Module):
         z = torch.cat((state_out, act_out), dim=1)  # Concat along hidden_dim
         z = F.relu(self.hidden(z))
         ac_scores = self.act_scorer(z).squeeze(-1)
+
+        # print("- Forward times")
+        # print("  + Enc acts: % .3f" % time_enc_act)
+        # print("  + Enc obs: % .3f" % time_enc_obs)
+        # print("  + Enc look: % .3f" % time_enc_look)
+        # print("  + Enc inv: % .3f" % time_enc_inv)
+        time_total = time.time() - time_total
+        print(" - forward() time  %.3f" % time_total )
 
         # Split up the q-values by batch
         return ac_scores.split(act_sizes)

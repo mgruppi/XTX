@@ -230,6 +230,7 @@ class LMActorCriticTrainer(Trainer):
 
         # Save model weights etc.
         if step % self.checkpoint_freq == 0:
+            print("---- SAV")
             self.agent.save(int(step / self.checkpoint_freq),
                             self.top_k_traj if self.use_action_model else None)
 

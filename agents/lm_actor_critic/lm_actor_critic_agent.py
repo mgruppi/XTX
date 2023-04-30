@@ -35,13 +35,14 @@ class LMActorCriticAgent:
         args: Dict[str, Union[str, int, float]],
         envs: List[JerichoEnv],
         action_models,
-        model_name : str = 'sentence-transformers/all-distilroberta-v1'
+        model_name : str = 'sentence-transformers/all-distilroberta-v1',
     ):
         self.gamma = args.gamma
         self.batch_size = args.batch_size
         self.tokenizer = SentenceTokenizer(model_name, device)
         self.text_encoder = SentenceEncoder(model_name, device)
         args.drrn_embedding_dim = 768  # Override default dim for now
+        args.embedding_dim = args.drrn_embedding_dim
         self.network = LMActorCriticQNetwork(
             tb=tb,
             log=log,
@@ -270,6 +271,8 @@ class LMActorCriticAgent:
 
     def save(self, step: int, traj: List = None):
         try:
+            print("- saving checkpoint to dir:")
+            print(wandb.run.dir)
             # save locally
             pickle.dump(
                 self.memory,

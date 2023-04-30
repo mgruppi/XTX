@@ -16,6 +16,8 @@ from utils.memory import State, StateWithActs
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+import time
+
 
 def setup_env(self, envs):
     """
@@ -103,6 +105,7 @@ def init_model(model, args: Dict[str, Union[str, int, float]], vocab_size: int, 
     model.drrn_hidden_dim = args.drrn_hidden_dim
     model.tokenizer = tokenizer
     model.text_encoder = text_encoder
+    model.embedding_dim = args.embedding_dim
 
     model.obs_encoder = nn.GRU(
         args.drrn_embedding_dim, args.drrn_hidden_dim)
@@ -154,8 +157,13 @@ def packed_rnn(model, x, rnn):
     if model.hash_rep:
         return packed_hash(model, x)
 
-
-    embed = torch.cat([model.text_encoder.encode(x_i) for x_i in x]).to(device)
+    time_enc = time.time()
+    embed = torch.zeros((len(x), model.embedding_dim)).to(device)
+    # embed = [model.text_encoder.encode(x_i) for x_i in x]
+    for i, x_i in enumerate(x):
+        embed[i] = model.text_encoder.encode(x_i)
+    time_enc = time.time() - time_enc
+    embed = embed.to(device)
     embed = embed.unsqueeze(0)  # Add dimension so that we have 1 x batch size x EmbedDim
     out, _ = rnn(embed)
     out = out.squeeze(0)

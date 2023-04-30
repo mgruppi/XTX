@@ -1,6 +1,7 @@
 from transformers import AutoTokenizer, AutoModel
 import torch
 import numpy as np
+import typing
 
 
 # Mean Pooling - Take attention mask into account for correct averaging
@@ -65,12 +66,26 @@ class Encoder():
         """
         self.model = AutoModel.from_pretrained(model_name).to(device)
         self.device = device
+        self.cache = dict()
         if not compute_gradients:
             self.model.eval()
     
-    def encode(self, encoding_batch, no_grad=True):
-        model_output = self.model(**encoding_batch)
-        return mean_pooling(model_output, encoding_batch['attention_mask'])
+    def encode(self, encoding):
+        """
+        This method assumes a single `encoding` is passed in each call.
+        An encoding is a Mapping with keys `input_ids` and `attention_mask`.
+        """
+
+        if isinstance(encoding['input_ids'], typing.Hashable):
+            if encoding['input_ids'] in self.cache:
+                return self.cache[encoding['input_ids']]
+            else:
+                model_output = self.model(**encoding)
+                self.cache[encoding['input_ids']] = mean_pooling(model_output, encoding['attention_mask'])
+                return self.cache[encoding['input_ids']]
+        else:
+            model_output = self.model(**encoding)
+            return mean_pooling(model_output, encoding['attention_mask'])
 
 
 class SentenceEncoder():
