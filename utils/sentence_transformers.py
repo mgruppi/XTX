@@ -78,10 +78,10 @@ class Encoder():
 
         if isinstance(encoding['input_ids'], typing.Hashable):
             if encoding['input_ids'] in self.cache:
-                return self.cache[encoding['input_ids']]
+                return self.cache[encoding['input_ids']].to(self.device)
             else:
                 model_output = self.model(**encoding)
-                self.cache[encoding['input_ids']] = mean_pooling(model_output, encoding['attention_mask'])
+                self.cache[encoding['input_ids']] = mean_pooling(model_output, encoding['attention_mask']).to("cpu")
                 return self.cache[encoding['input_ids']]
         else:
             model_output = self.model(**encoding)
