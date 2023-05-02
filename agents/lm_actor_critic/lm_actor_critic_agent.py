@@ -287,9 +287,9 @@ class LMActorCriticAgent:
                 )
                 wandb.save(pjoin(wandb.run.dir, 'traj_{}.pkl'.format(step)))
 
-            # upload to wandb
-            wandb.save(pjoin(wandb.run.dir, 'weights_{}.pt'.format(step)))
-            wandb.save(pjoin(wandb.run.dir, 'memory_{}.pkl'.format(step)))
+            # # upload to wandb
+            # wandb.save(pjoin(wandb.run.dir, 'weights_{}.pt'.format(step)))
+            # wandb.save(pjoin(wandb.run.dir, 'memory_{}.pkl'.format(step)))
         except Exception as e:
             print("Error saving model.")
             logging.error(traceback.format_exc())
