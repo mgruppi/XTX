@@ -243,7 +243,7 @@ class LMActorCriticAgent:
     def load(self, run_id: str, weight_file: str, memory_file: str):
         try:
             api = wandb.Api()
-            run = api.run(f"princeton-nlp/text-games/{run_id}")
+            run = api.run(f"text-rl/xtx/{run_id}")
             run.file(f"{weight_file}.pt").download(wandb.run.dir)
             run.file(f"{memory_file}.pkl").download(wandb.run.dir)
 
