@@ -244,13 +244,17 @@ class LMActorCriticAgent:
         try:
             api = wandb.Api()
             run = api.run(f"text-rl/xtx/{run_id}")
-            run.file(f"{weight_file}.pt").download(wandb.run.dir)
-            run.file(f"{memory_file}.pkl").download(wandb.run.dir)
+            # run.file(f"{weight_file}.pt")  # .download(wandb.run.dir)
+            # run.file(f"{memory_file}.pkl")  #.download(wandb.run.dir)
 
+            print("Loading memory file:", memory_file)
             self.memory = pickle.load(
-                open(pjoin(wandb.run.dir, f"{memory_file}.pkl"), 'rb'))
+                # open(pjoin(wandb.run.dir, f"{memory_file}.pkl"), 'rb'))
+                open(memory_file, 'rb'))
+            print("Loading weight file:", weight_file)
             self.network.load_state_dict(
-                torch.load(pjoin(wandb.run.dir, f"{weight_file}.pt")))
+                # torch.load(pjoin(wandb.run.dir, f"{weight_file}.pt")))
+                torch.load(weight_file))
         except Exception as e:
             self.log(f"Error loading model {e}")
             logging.error(traceback.format_exc())

@@ -242,6 +242,12 @@ def main():
     np.random.seed(args.seed)
     random.seed(args.seed)
 
+    # Set resume (if any)
+    if args.run_id:
+        wandb.init(id=args.run_id, resume=True, allow_val_change=True)
+        wandb.config.update({'allow_val_change': True})
+
+
     # Start logger
     tb, log = configure_logger(args)
 

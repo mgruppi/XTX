@@ -68,8 +68,11 @@ class LMActorCriticTrainer(Trainer):
                     transitions, obs, infos):
         """
         """
+        print("Env step...")
+        print("\t Actions:", action_strs)
         next_obs, next_rewards, next_dones, next_infos = self.envs.step(
             action_strs)
+        print("Env stepped.")
 
         if self.use_action_model:
             next_states = self.agent.build_states(
@@ -205,11 +208,13 @@ class LMActorCriticTrainer(Trainer):
             self.log('Q-Values: {}'.format(s))
 
             # Update all envs
+            print("Updating steps...")
             infos, next_states, next_valids, max_score, obs = self.update_envs(
                 action_strs, action_ids, states, max_score, transitions, obs, infos)
             states, valid_ids = next_states, next_valids
-
+            print("Ending...")
             self.end_step(step, start, max_score, action_qvals, max_eval)
+            print("Step Ended")
 
     def end_step(self, step: int, start, max_score: int, action_qvals,
                  max_eval: int):
