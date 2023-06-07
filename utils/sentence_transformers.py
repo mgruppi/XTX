@@ -53,7 +53,9 @@ class Tokenizer():
     
     def encode(self, batch):
         return self.model(batch, padding=True, truncation=True, return_tensors='pt').to(self.device)
-        
+    
+    def convert_tokens_to_ids(self, tks):
+        return self.model.convert_tokens_to_ids(tks)
 
 class Encoder():
     def __init__(self, model_name, device, compute_gradients=False):

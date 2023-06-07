@@ -91,6 +91,7 @@ def act(model,
             model.tb.logkv_mean('Uniform entropy', Categorical(
                 torch.ones_like(probs[0])/len(probs[0])).entropy())
 
+        print("***", probs)
         act_idxs = [
             torch.multinomial(dist, num_samples=1).item() for dist in probs
         ]

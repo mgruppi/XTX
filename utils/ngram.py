@@ -216,7 +216,7 @@ def action_model_forward(model, states, valid_strs, q_values, act_sizes, il_eval
     """
     # ** action model forward **
     class_name = get_class_name(model).lower()
-    if 'drrn' in class_name:
+    if 'drrn' in class_name or 'actor' in class_name:
         past_acts = StateWithActs(*zip(*states)).acts
 
     # TODO: finish transformer case
@@ -269,6 +269,9 @@ def action_model_forward(model, states, valid_strs, q_values, act_sizes, il_eval
         with torch.no_grad():
             predictions = model.action_models(
                 input_ids, attention_mask=att_masks)[0]
+            print("PREDICTIONS", predictions)
+            print(predictions.shape)
+            print("ACT MASK", act_mask)
         for prediction, ids, act_mask in zip(predictions, input_ids, act_masks):
             prediction = prediction[np.argmax(act_mask)-1:-1]
             log_p = torch.nn.functional.log_softmax(prediction, dim=-1)

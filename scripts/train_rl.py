@@ -14,14 +14,16 @@ from agents import (
     DrrnAgent,
     DrrnInvDynAgent,
     DrrnGraphInvDynAgent,
-    LMActorCriticAgent
+    LMActorCriticAgent,
+    GraphLMActorCriticAgent
 )
 
 from trainers import (
     DrrnTrainer,
     DrrnInvDynTrainer,
     DrrnGraphInvDynTrainer,
-    LMActorCriticTrainer
+    LMActorCriticTrainer,
+    GraphLMActorCriticTrainer
 )
 
 from transformers import GPT2LMHeadModel, GPT2Config
@@ -283,6 +285,21 @@ def main():
         envs = VecEnv(args.num_envs, eval_env)
         agent = LMActorCriticAgent(tb, log, args, envs, None)
         trainer = LMActorCriticTrainer(tb, log, agent, envs, eval_env, args)
+        
+    elif args.model_name == defs.XTX_LLM:
+        assert args.use_il == args.use_action_model, "action model stuff should be on when using IL."
+        assert args.r_for > 0, "r_for needs to be ON when using inverse dynamics."
+        if args.il_use_dropout or args.il_use_only_dropout:
+            assert args.il_use_dropout != args.il_use_only_dropout, "cannot use two types of dropout at the same time."
+
+        envs = VecEnv(args.num_envs, eval_env)
+
+        config = GPT2Config(vocab_size=args.il_vocab_size, n_embd=args.tf_embedding_dim,
+                            n_layer=args.tf_num_layers, n_head=args.nhead, n_positions=args.il_max_context, n_ctx=args.il_max_context)
+        lm = GPT2LMHeadModel(config)
+        lm.train()
+        agent = GraphLMActorCriticAgent(args, tb, log, envs, action_models=lm)
+        trainer = GraphLMActorCriticTrainer(tb, log, agent, envs, eval_env, args)
     
     elif args.model_name == defs.DRRN:
         assert args.use_action_model == 0, "'use_action_model' needs to be OFF"
@@ -308,7 +325,7 @@ def main():
         lm.train()
         agent = DrrnGraphInvDynAgent(args, tb, log, envs, action_models=lm)
         trainer = DrrnGraphInvDynTrainer(tb, log, agent, envs, eval_env, args)
-
+    
     elif args.model_name == defs.INV_DY:
         assert args.r_for > 0, "r_for needs to be ON when using inverse dynamics."
         assert args.use_action_model == 0, "'use_action_model' needs to be OFF."

@@ -76,8 +76,10 @@ class LMActorCriticTrainer(Trainer):
         # Remove actions from `next_infos` to prevent a bug in Zork 1
         # [[cmd for cmd in ad_cmd if 'put sack in' not in cmd and cmd != 'put all in nest'] \
         #                              for ad_cmd in admissible_commands]
-        next_infos['valid'] = [[cmd for cmd in ad_cmd if 'put sack in' not in cmd and cmd != 'put all in nest']
-                               for ad_cmd in next_infos['valid']]
+        next_infos = list(next_infos)
+        # Sanitize next valid moves
+        for next_info in next_infos:
+            next_info['valid'] = [cmd for cmd in next_info['valid'] if 'put sack in' not in cmd and cmd != 'put all in nest']
 
         if self.use_action_model:
             next_states = self.agent.build_states(
@@ -213,13 +215,10 @@ class LMActorCriticTrainer(Trainer):
             self.log('Q-Values: {}'.format(s))
 
             # Update all envs
-            print("Updating steps...")
             infos, next_states, next_valids, max_score, obs = self.update_envs(
                 action_strs, action_ids, states, max_score, transitions, obs, infos)
             states, valid_ids = next_states, next_valids
-            print("Ending...")
             self.end_step(step, start, max_score, action_qvals, max_eval)
-            print("Step Ended")
 
     def end_step(self, step: int, start, max_score: int, action_qvals,
                  max_eval: int):

@@ -97,6 +97,7 @@ class VecEnv:
         assert len(
             actions) == self.num_envs, "Error: incorrect number of actions."
         for remote, action in zip(self.remotes, actions):
+            print("sending step", action)
             remote.send(('step', action))
         results = [remote.recv() for remote in self.remotes]
         self.waiting = False
