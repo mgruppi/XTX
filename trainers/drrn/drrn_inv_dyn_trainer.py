@@ -71,6 +71,14 @@ class DrrnInvDynTrainer(Trainer):
         next_obs, next_rewards, next_dones, next_infos = self.envs.step(
             action_strs)
 
+        # Remove actions from `next_infos` to prevent a bug in Zork 1
+        # [[cmd for cmd in ad_cmd if 'put sack in' not in cmd and cmd != 'put all in nest'] \
+        #                              for ad_cmd in admissible_commands]
+        next_infos = list(next_infos)
+        # Sanitize next valid moves
+        for next_info in next_infos:
+            next_info['valid'] = [cmd for cmd in next_info['valid'] if 'put sack in' not in cmd and cmd != 'put all in nest']
+
         if self.use_action_model:
             next_states = self.agent.build_states(
                 next_obs, next_infos, action_strs, [state.acts for state in states])
