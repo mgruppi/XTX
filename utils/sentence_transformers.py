@@ -73,6 +73,12 @@ class Tokenizer():
 
     def convert_tokens_to_ids(self, tks):
         return self.model.convert_tokens_to_ids(tks)
+
+    def convert_tokens_to_string(self, tks):
+        return self.model.convert_tokens_to_string(tks)
+
+    def convert_ids_to_tokens(self, ids):
+        return self.model.convert_ids_to_tokens(ids)
     
     def __len__(self):
         return len(self.model)
@@ -256,13 +262,19 @@ if __name__ == "__main__":
                 ]
     batched_sequences = [ sentences, sentences, sentences]
 
-    tokenizer = Tokenizer()
-    encoder = Encoder()
+    tokenizer = Tokenizer(model_name='sentence-transformers/all-distilroberta-v1', device='cpu')
+    # encoder = Encoder()
 
-    encodings = tokenizer.encode(sentences)
-    embeddings = encoder.encode(encodings)
+    tokens = tokenizer.encode(sentences[0])
 
-    print(embeddings.shape)
+    print(tokens)
+    print(tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(tokens)))
+    
+
+    # encodings = tokenizer.encode(sentences)
+    # embeddings = encoder.encode(encodings)
+
+    # print(embeddings.shape)
 
     # params = {
     #     "output_attentions": True,
