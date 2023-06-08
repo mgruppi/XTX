@@ -46,7 +46,7 @@ class LMDrrnAgent:
         self.text_encoder = SentenceEncoder(model_name, device, output_encoding='tokens', vocab_size=len(self.tokenizer))
         
         # Get embedding size from LM
-        x_tmp = self.text_encoder(torch.Tensor([self.tokenizer.encode('test')]).long())
+        x_tmp = self.text_encoder(torch.Tensor([self.tokenizer.encode('test')]).long().to(device))
         emb_size = x_tmp.shape[-1]
 
         args.drrn_embedding_dim = emb_size  # Override default dim for now

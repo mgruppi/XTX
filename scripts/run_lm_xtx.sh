@@ -13,7 +13,7 @@ python3 -m scripts.train_rl --output_dir logs/${LOG_FOLDER} \
                     --jericho_seed ${JERICHO_SEED} \
                     --model_name ${MODEL_NAME} \
                     --eval_freq 10000000 \
-                    --memory_size 10000 \
+                    --memory_size 5000 \
                     --T 1 \
                     --w_inv 1 \
                     --r_for 1 \
