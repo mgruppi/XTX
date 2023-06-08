@@ -4,3 +4,5 @@ from agents.drrn.drrn_graph_inv_dyn_agent import DrrnGraphInvDynAgent
 from agents.lm_actor_critic.lm_actor_critic_agent import LMActorCriticAgent
 from agents.lm_actor_critic.graph_lm_actor_critic_agent import GraphLMActorCriticAgent
 from agents.drrn.lm_drrn_agent import LMDrrnAgent
+from agents.drrn.lm_drrn_inv_dyn_agent import LMDrrnInvDynAgent
+from agents.drrn.lm_drrn_graph_inv_dyn_agent import LMDrrnGraphInvDynAgent

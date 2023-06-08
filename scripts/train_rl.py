@@ -16,7 +16,8 @@ from agents import (
     DrrnGraphInvDynAgent,
     LMActorCriticAgent,
     LMDrrnAgent,
-    GraphLMActorCriticAgent
+    GraphLMActorCriticAgent,
+    LMDrrnGraphInvDynAgent
 )
 
 from trainers import (
@@ -292,7 +293,7 @@ def main():
         agent = LMDrrnAgent(tb, log, args, envs, None)
         trainer = DrrnTrainer(tb, log, agent, envs, eval_env, args)
         
-    elif args.model_name == defs.XTX_LLM:
+    elif args.model_name == defs.LM_XTX:
         assert args.use_il == args.use_action_model, "action model stuff should be on when using IL."
         assert args.r_for > 0, "r_for needs to be ON when using inverse dynamics."
         if args.il_use_dropout or args.il_use_only_dropout:
@@ -304,8 +305,8 @@ def main():
                             n_layer=args.tf_num_layers, n_head=args.nhead, n_positions=args.il_max_context, n_ctx=args.il_max_context)
         lm = GPT2LMHeadModel(config)
         lm.train()
-        agent = GraphLMActorCriticAgent(args, tb, log, envs, action_models=lm)
-        trainer = GraphLMActorCriticTrainer(tb, log, agent, envs, eval_env, args)
+        agent = LMDrrnGraphInvDynAgent(args, tb, log, envs, action_models=lm)
+        trainer = DrrnGraphInvDynTrainer(tb, log, agent, envs, eval_env, args)
     
     elif args.model_name == defs.DRRN:
         assert args.use_action_model == 0, "'use_action_model' needs to be OFF"
