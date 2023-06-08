@@ -13,8 +13,11 @@ from utils.memory import StateWithActs, State
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def init(model, args, vocab_size):
-    model.embedding = nn.Embedding(vocab_size, args.drrn_embedding_dim)
+def init(model, args, vocab_size, text_encoder=None):
+    if text_encoder == None:
+        model.embedding = nn.Embedding(vocab_size, args.drrn_embedding_dim)
+    else:
+        model.embedding = text_encoder
     model.obs_encoder = nn.GRU(args.drrn_embedding_dim, args.drrn_hidden_dim)
     model.look_encoder = nn.GRU(args.drrn_embedding_dim, args.drrn_hidden_dim)
     model.inv_encoder = nn.GRU(args.drrn_embedding_dim, args.drrn_hidden_dim)
@@ -215,6 +218,8 @@ def inv_loss_decode(model, state_batch, next_state_batch, acts, hat=True, reduct
         0), (act_out_hat if hat else act_out).unsqueeze(0)
     for t in range(1, l):
         input = model.embedding(input)
+        print("input", input.shape)
+        print("z", z.shape)
         output, z = model.act_decoder(input, z)
         output = model.act_fc(output)
         outputs[t] = output

@@ -34,7 +34,8 @@ class LMDrrnInvDynAgent(LMDrrnAgent):
             self.tokenizer,
             action_models,
             tb,
-            log
+            log,
+            text_encoder = self.text_encoder
         ).to(device)
 
         self.target_network = DrrnInvDynQNetwork(
@@ -44,7 +45,8 @@ class LMDrrnInvDynAgent(LMDrrnAgent):
             self.tokenizer,
             action_models,
             tb,
-            log
+            log,
+            text_encoder = self.text_encoder
         ).to(device)
         self.target_network.eval()
         self.network.tokenizer = self.tokenizer

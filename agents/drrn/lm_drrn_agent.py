@@ -43,7 +43,7 @@ class LMDrrnAgent:
         self.batch_size = args.batch_size
         # self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.tokenizer = SentenceTokenizer(model_name, device)
-        self.text_encoder = SentenceEncoder(model_name, device, output_encoding='tokens')
+        self.text_encoder = SentenceEncoder(model_name, device, output_encoding='tokens', vocab_size=len(self.tokenizer))
         args.drrn_embedding_dim = 768  # Override default dim for now
         args.embedding_dim = args.drrn_embedding_dim
         self.network = DrrnQNetwork(
@@ -53,6 +53,7 @@ class LMDrrnAgent:
             envs=envs,
             action_models=action_models,
             tokenizer=self.tokenizer,
+            text_encoder=self.text_encoder,
             args=args
         ).to(device)
         self.target_network = DrrnQNetwork(
@@ -62,6 +63,7 @@ class LMDrrnAgent:
             envs=envs,
             action_models=action_models,
             tokenizer=self.tokenizer,
+            text_encoder=self.text_encoder,
             args=args
         ).to(device)
         self.target_network.eval()

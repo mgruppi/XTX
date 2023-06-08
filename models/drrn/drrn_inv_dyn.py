@@ -31,10 +31,10 @@ class DrrnInvDynQNetwork(DrrnQNetwork):
         tokenizer,
         action_models,
         tb: logger.Logger = None,
-        log: Callable[..., None] = None
+        log: Callable[..., None] = None,
+        text_encoder = None
     ):
-        super().__init__(tb, log, vocab_size, envs, action_models, tokenizer, args)
-        self.embedding = nn.Embedding(vocab_size, args.drrn_embedding_dim)
+        super().__init__(tb, log, vocab_size, envs, action_models, tokenizer, args, text_encoder=text_encoder)
         self.obs_encoder = nn.GRU(
             args.drrn_embedding_dim, args.drrn_hidden_dim)
         self.look_encoder = nn.GRU(

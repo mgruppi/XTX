@@ -25,7 +25,8 @@ from trainers import (
     DrrnInvDynTrainer,
     DrrnGraphInvDynTrainer,
     LMActorCriticTrainer,
-    GraphLMActorCriticTrainer
+    GraphLMActorCriticTrainer,
+    LMDrrnGraphTrainer
 )
 
 from transformers import GPT2LMHeadModel, GPT2Config
@@ -306,7 +307,7 @@ def main():
         lm = GPT2LMHeadModel(config)
         lm.train()
         agent = LMDrrnGraphInvDynAgent(args, tb, log, envs, action_models=lm)
-        trainer = DrrnGraphInvDynTrainer(tb, log, agent, envs, eval_env, args)
+        trainer = LMDrrnGraphTrainer(tb, log, agent, envs, eval_env, args)
     
     elif args.model_name == defs.DRRN:
         assert args.use_action_model == 0, "'use_action_model' needs to be OFF"

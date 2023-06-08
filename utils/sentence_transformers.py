@@ -69,7 +69,7 @@ class Tokenizer():
     
     def encode(self, batch):
         # return self.model(batch, padding=True, truncation=True, return_tensors='pt').to(self.device)
-        return self.model(batch, padding=True, truncation=True, return_tensors='pt')['input_ids'].cpu()[0]
+        return self.model(batch, padding=True, truncation=True, return_tensors='pt')['input_ids'].cpu()[0].tolist()
 
     def convert_tokens_to_ids(self, tks):
         return self.model.convert_tokens_to_ids(tks)
@@ -79,7 +79,8 @@ class Tokenizer():
         
 
 class Encoder():
-    def __init__(self, model_name, device, compute_gradients=False, output_encoding='sentence'):
+    def __init__(self, model_name, device, compute_gradients=False, output_encoding='sentence',
+                 vocab_size=0):
         """
         
         Args:
@@ -92,6 +93,7 @@ class Encoder():
         self.device = device
         self.cache = dict()
         self.output_encoding = output_encoding
+        self.num_embeddings = vocab_size
 
         if self.output_encoding == 'sentence':
             self.output_func = mean_pooling
@@ -106,16 +108,25 @@ class Encoder():
         An encoding is a Mapping with keys `input_ids` and `attention_mask`.
         """
 
-        if isinstance(encoding['input_ids'], typing.Hashable):
-            if encoding['input_ids'] in self.cache:
-                return self.cache[encoding['input_ids']].to(self.device)
+        if type(encoding) is dict:
+            if isinstance(encoding['input_ids'], typing.Hashable):
+                if encoding['input_ids'] in self.cache:
+                    return self.cache[encoding['input_ids']].to(self.device)
+                else:
+                    model_output = self.model(**encoding)
+                    self.cache[encoding['input_ids']] = self.output_func(model_output, encoding['attention_mask']).to("cpu")
+                    return self.cache[encoding['input_ids']]
             else:
                 model_output = self.model(**encoding)
-                self.cache[encoding['input_ids']] = self.output_func(model_output, encoding['attention_mask']).to("cpu")
-                return self.cache[encoding['input_ids']]
+                return self.output_func(model_output, encoding['attention_mask'])
         else:
-            model_output = self.model(**encoding)
-            return self.output_func(model_output, encoding['attention_mask'])
+            return self.output_func(self.model(encoding))
+
+    def __call__(self, input):
+        """
+        Call to encode
+        """
+        return self.encode(input)
 
 
 class SentenceEncoder():

@@ -232,6 +232,10 @@ def action_model_forward(model, states, valid_strs, q_values, act_sizes, il_eval
             context_acts = acts[-model.max_acts:]
             act_history = [model.tokenizer.encode(
                 act) for act in context_acts] if len(acts) > 0 else []
+            
+            # print("***", "act_history", type(act_history), "obs", type(state.obs), "descr", type(state.description))
+            # print("obs", state.obs)
+
             context = [cls_id] + \
                 flatten_2d([act[1:-1] + [sep_id]
                            for act in act_history]) + state.obs[1:-1] + state.description[1:-1] + state.inventory[1:-1] + [sep_id]
@@ -269,9 +273,9 @@ def action_model_forward(model, states, valid_strs, q_values, act_sizes, il_eval
         with torch.no_grad():
             predictions = model.action_models(
                 input_ids, attention_mask=att_masks)[0]
-            print("PREDICTIONS", predictions)
-            print(predictions.shape)
-            print("ACT MASK", act_mask)
+            # print("PREDICTIONS", predictions)
+            # print(predictions.shape)
+            # print("ACT MASK", act_mask)
         for prediction, ids, act_mask in zip(predictions, input_ids, act_masks):
             prediction = prediction[np.argmax(act_mask)-1:-1]
             log_p = torch.nn.functional.log_softmax(prediction, dim=-1)

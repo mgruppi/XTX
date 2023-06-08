@@ -96,10 +96,15 @@ def act(model,
     return act_idxs, act_values
 
 
-def init_model(model, args: Dict[str, Union[str, int, float]], vocab_size: int, tokenizer):
+def init_model(model, args: Dict[str, Union[str, int, float]], vocab_size: int, tokenizer,
+                text_encoder=None):
     model.use_drrn_inv_look = args.use_drrn_inv_look
 
-    model.embedding = nn.Embedding(vocab_size, args.drrn_embedding_dim)
+    if text_encoder is None:
+        model.embedding = nn.Embedding(vocab_size, args.drrn_embedding_dim)
+    else:
+        model.embedding = text_encoder
+        
     model.drrn_hidden_dim = args.drrn_hidden_dim
     model.tokenizer = tokenizer
 

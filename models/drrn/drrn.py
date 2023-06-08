@@ -26,7 +26,8 @@ class DrrnQNetwork(nn.Module):
                  envs: List[JerichoEnv],
                  action_models,
                  tokenizer,
-                 args: Dict[str, Union[str, int, float]]):
+                 args: Dict[str, Union[str, int, float]],
+                 text_encoder=None):
         super(DrrnQNetwork, self).__init__()
         self.sample_argmax = args.sample_argmax
         self.sample_uniform = args.sample_uniform
@@ -35,7 +36,7 @@ class DrrnQNetwork(nn.Module):
         self.log = log
         self.tb = tb
 
-        Drrn.init_model(self, args, vocab_size, tokenizer)
+        Drrn.init_model(self, args, vocab_size, tokenizer, text_encoder=text_encoder)
 
         self.use_action_model = args.use_action_model
         if self.use_action_model:
