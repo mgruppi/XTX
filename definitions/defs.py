@@ -7,6 +7,7 @@ DRRN = 'drrn'
 INV_DY = 'inv_dy'
 XTX = 'xtx'
 LM_AC = 'lm_actor_critic'
+LM_DRRN = 'lm_drrn'
 XTX_LLM = 'xtx_llm'
 
 UNIFORM = 'uniform'

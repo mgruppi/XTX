@@ -23,6 +23,22 @@ def mean_pooling(model_output, attention_mask):
     return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
 
+def token_pooling(model_output, attention_mask=None):
+    """
+    Performs "token pooling" on model_output.
+    This is just the sequence of tokens computed in model_output. No additional steps required.
+
+    Arguments:
+        model_output: torch.Tensor -- Token embeddings
+        attention_mask: Optional -- not used.
+    
+    Returns:
+        sentence_embeddings: torch.Tensor -- the sequence of token embeddings.
+    """
+
+    return model_output[0]
+
+
 def weighted_mean_pooling(model_output, attention_mask, attention_weights):
     """
     Performs weighted mean pooling of the input.
@@ -52,23 +68,35 @@ class Tokenizer():
         self.model = AutoTokenizer.from_pretrained(model_name)
     
     def encode(self, batch):
-        return self.model(batch, padding=True, truncation=True, return_tensors='pt').to(self.device)
-    
+        # return self.model(batch, padding=True, truncation=True, return_tensors='pt').to(self.device)
+        return self.model(batch, padding=True, truncation=True, return_tensors='pt')['input_ids'].cpu()[0]
+
     def convert_tokens_to_ids(self, tks):
         return self.model.convert_tokens_to_ids(tks)
+    
+    def __len__(self):
+        return len(self.model)
+        
 
 class Encoder():
-    def __init__(self, model_name, device, compute_gradients=False):
+    def __init__(self, model_name, device, compute_gradients=False, output_encoding='sentence'):
         """
         
         Args:
             model_name (str) : Name of the Huggingface model.
             device (str) : CUDA device or CPU.
             compute_gradient (bool) : If False, model is put in eval mode.
+            output_encoding (str) : If 'sentence', returns the aggregate sentence embedding. If 'tokens' return sequences of token embeddings.
         """
         self.model = AutoModel.from_pretrained(model_name).to(device)
         self.device = device
         self.cache = dict()
+        self.output_encoding = output_encoding
+
+        if self.output_encoding == 'sentence':
+            self.output_func = mean_pooling
+        elif self.output_encoding == 'tokens':
+            self.output_func = token_pooling
         if not compute_gradients:
             self.model.eval()
     
@@ -83,11 +111,11 @@ class Encoder():
                 return self.cache[encoding['input_ids']].to(self.device)
             else:
                 model_output = self.model(**encoding)
-                self.cache[encoding['input_ids']] = mean_pooling(model_output, encoding['attention_mask']).to("cpu")
+                self.cache[encoding['input_ids']] = self.output_func(model_output, encoding['attention_mask']).to("cpu")
                 return self.cache[encoding['input_ids']]
         else:
             model_output = self.model(**encoding)
-            return mean_pooling(model_output, encoding['attention_mask'])
+            return self.output_func(model_output, encoding['attention_mask'])
 
 
 class SentenceEncoder():

@@ -15,6 +15,7 @@ from agents import (
     DrrnInvDynAgent,
     DrrnGraphInvDynAgent,
     LMActorCriticAgent,
+    LMDrrnAgent,
     GraphLMActorCriticAgent
 )
 
@@ -285,6 +286,11 @@ def main():
         envs = VecEnv(args.num_envs, eval_env)
         agent = LMActorCriticAgent(tb, log, args, envs, None)
         trainer = LMActorCriticTrainer(tb, log, agent, envs, eval_env, args)
+    
+    elif args.model_name == defs.LM_DRRN:
+        envs = VecEnv(args.num_envs, eval_env)
+        agent = LMDrrnAgent(tb, log, args, envs, None)
+        trainer = DrrnTrainer(tb, log, agent, envs, eval_env, args)
         
     elif args.model_name == defs.XTX_LLM:
         assert args.use_il == args.use_action_model, "action model stuff should be on when using IL."
