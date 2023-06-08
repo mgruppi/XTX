@@ -263,13 +263,17 @@ if __name__ == "__main__":
     batched_sequences = [ sentences, sentences, sentences]
 
     tokenizer = Tokenizer(model_name='sentence-transformers/all-distilroberta-v1', device='cpu')
-    # encoder = Encoder()
+    encoder = Encoder(model_name='sentence-transformers/all-distilroberta-v1', device='cpu')
 
     tokens = tokenizer.encode(sentences[0])
 
     print(tokens)
     print(tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(tokens)))
     
+    tokens = torch.Tensor([tokens]).long()
+    print("tk", tokens.shape)
+    x = encoder.model(tokens)
+    print(x[0].shape[-1])
 
     # encodings = tokenizer.encode(sentences)
     # embeddings = encoder.encode(encodings)

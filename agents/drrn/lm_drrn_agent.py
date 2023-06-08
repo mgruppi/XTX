@@ -44,7 +44,13 @@ class LMDrrnAgent:
         # self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.tokenizer = SentenceTokenizer(model_name, device)
         self.text_encoder = SentenceEncoder(model_name, device, output_encoding='tokens', vocab_size=len(self.tokenizer))
-        args.drrn_embedding_dim = 768  # Override default dim for now
+        
+        # Get embedding size from LM
+        x_tmp = self.text_encoder(torch.Tensor([self.tokenizer.encode('test')]).long())
+        emb_size = x_tmp.shape[-1]
+
+        args.drrn_embedding_dim = emb_size  # Override default dim for now
+        
         args.embedding_dim = args.drrn_embedding_dim
         self.network = DrrnQNetwork(
             tb=tb,
