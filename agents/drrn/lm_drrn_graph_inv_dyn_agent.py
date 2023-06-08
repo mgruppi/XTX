@@ -2,13 +2,13 @@
 import torch
 
 # Custom Imports
-from agents import LMDrrnInvDynAgent
+from agents import LMDrrnAgent
 from utils.il_buffer import ILBuffer
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-class LMDrrnGraphInvDynAgent(LMDrrnInvDynAgent):
+class LMDrrnGraphInvDynAgent(LMDrrnAgent):
     def __init__(self, args, tb, log, envs, action_models):
         super().__init__(args, action_models, tb, log, envs)
 
