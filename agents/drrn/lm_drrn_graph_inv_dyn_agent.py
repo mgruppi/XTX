@@ -10,7 +10,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class LMDrrnGraphInvDynAgent(LMDrrnAgent):
     def __init__(self, args, tb, log, envs, action_models):
-        super().__init__(args, action_models, tb, log, envs)
+        super().__init__(args=args, action_models=action_models, tb=tb, log=log, envs=envs)
 
         if args.use_il_buffer_sampler:
             self.il_buffer = ILBuffer(self, args, log, tb)
