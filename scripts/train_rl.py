@@ -230,6 +230,12 @@ def parse_args():
                         type=int,
                         help='whether to replace sampling with argmax')
 
+    # LM params
+    parser.add_argument("--lm_model_name",
+                        default="sentence-transformers/all-distilroberta-v1",
+                        type=str,
+                        help="Name of the model to load")
+
     return parser.parse_args()
 
 
@@ -306,7 +312,7 @@ def main():
                             n_layer=args.tf_num_layers, n_head=args.nhead, n_positions=args.il_max_context, n_ctx=args.il_max_context)
         lm = GPT2LMHeadModel(config)
         lm.train()
-        agent = LMDrrnGraphInvDynAgent(args, tb, log, envs, action_models=lm)
+        agent = LMDrrnGraphInvDynAgent(args, tb, log, envs, action_models=lm, model_name=args.lm_model_name)
         trainer = LMDrrnGraphTrainer(tb, log, agent, envs, eval_env, args)
     
     elif args.model_name == defs.DRRN:
