@@ -63,13 +63,17 @@ def normalize(x):
 
 
 class Tokenizer():
-    def __init__(self, model_name, device):
+    def __init__(self, model_name, device, as_list=False):
         self.device = device
+        self.as_list = as_list
         self.model = AutoTokenizer.from_pretrained(model_name)
     
     def encode(self, batch):
-        # return self.model(batch, padding=True, truncation=True, return_tensors='pt').to(self.device)
-        return self.model(batch, padding=True, truncation=True, return_tensors='pt')['input_ids'].cpu()[0].tolist()
+        if self.as_list:
+            return self.model(batch, padding=True, truncation=True, return_tensors='pt')['input_ids'].cpu()[0].tolist()
+        else:
+            return self.model(batch, padding=True, truncation=True, return_tensors='pt').to(self.device)
+
 
     def convert_tokens_to_ids(self, tks):
         return self.model.convert_tokens_to_ids(tks)
