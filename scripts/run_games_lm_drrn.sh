@@ -2,7 +2,7 @@ LOG_FOLDER='zork1_roberta'
 # GAME='zork1.z5'
 SEED=0
 JERICHO_SEED=$SEED # set to -1 if you want stochastic version
-MODEL_NAME='lm_actor_critic'
+MODEL_NAME='lm_drrn'
 JERICHO_ADD_WT='add_wt' # change to 'no_add_wt' if you don't want to add extra actions to game grammar
 
 MEMORY_SIZE=10000  # Override memory_size - this is the same value used for inv_dy
