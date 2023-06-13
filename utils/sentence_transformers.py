@@ -118,19 +118,20 @@ class Encoder():
         An encoding is a Mapping with keys `input_ids` and `attention_mask`.
         """
 
-        if type(encoding) is dict:
-            if isinstance(encoding['input_ids'], typing.Hashable):
-                if encoding['input_ids'] in self.cache:
-                    return self.cache[encoding['input_ids']].to(self.device)
+        with torch.no_grad():  # torch.no_grad() has a different goal than that of model.eval() - the former reduces the memory usage
+            if type(encoding) is dict:
+                if isinstance(encoding['input_ids'], typing.Hashable):
+                    if encoding['input_ids'] in self.cache:
+                        return self.cache[encoding['input_ids']].to(self.device)
+                    else:
+                        model_output = self.model(**encoding)
+                        self.cache[encoding['input_ids']] = self.output_func(model_output, encoding['attention_mask']).to("cpu")
+                        return self.cache[encoding['input_ids']]
                 else:
                     model_output = self.model(**encoding)
-                    self.cache[encoding['input_ids']] = self.output_func(model_output, encoding['attention_mask']).to("cpu")
-                    return self.cache[encoding['input_ids']]
+                    return self.output_func(model_output, encoding['attention_mask'])
             else:
-                model_output = self.model(**encoding)
-                return self.output_func(model_output, encoding['attention_mask'])
-        else:
-            return self.output_func(self.model(encoding))
+                return self.output_func(self.model(encoding))
 
     def __call__(self, input):
         """
