@@ -83,6 +83,9 @@ class Tokenizer():
 
     def convert_ids_to_tokens(self, ids):
         return self.model.convert_ids_to_tokens(ids)
+
+    def decode(self, ids, skip_special_tokens=True):
+        return self.model.decode(ids, skip_special_tokens=skip_special_tokens)
     
     def __len__(self):
         return len(self.model)
