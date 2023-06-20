@@ -1,4 +1,4 @@
-LOG_FOLDER='lm_drrn_zork1'
+LOG_FOLDER='roberta_zork1'
 GAME='zork1.z5'
 SEED=0
 JERICHO_SEED=$SEED # set to -1 if you want stochastic version
@@ -14,4 +14,5 @@ python3 -m scripts.train_rl --output_dir logs/${LOG_FOLDER} \
                     --jericho_seed ${JERICHO_SEED} \
                     --model_name ${MODEL_NAME} \
                     --eval_freq 10000000 \
-                    --jericho_add_wt ${JERICHO_ADD_WT}
+                    --jericho_add_wt ${JERICHO_ADD_WT} \
+                    --memory_size ${MEMORY_SIZE}
