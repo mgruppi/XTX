@@ -14,7 +14,7 @@ do
     LOG_FOLDER="xtx_$game_name"
 
     python3 -m scripts.train_rl --output_dir logs/${LOG_FOLDER} \
-                        --rom_path games/${GAME} \
+                        --rom_path games/${game_name} \
                         --seed ${SEED} \
                         --jericho_seed ${JERICHO_SEED} \
                         --model_name ${MODEL_NAME} \
