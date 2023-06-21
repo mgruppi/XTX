@@ -267,15 +267,16 @@ class LoRAEncoder(Encoder):
         super().__init__(model_name, device, **kwargs)
 
         config = LoraConfig(
-            r=32,
-            lora_alpha=32,
+            r=8,
+            lora_alpha=8,
             target_modules=["query", "value"],
             lora_dropout=0.1,
             bias="lora_only",
             modules_to_save=["decode_head"]
         )
 
-        self.lora_model = get_peft_model(self.model, config)
+        self.model = get_peft_model(self.model, config)
+        self.model.train()
 
     def encode(self, encoding):
         """
