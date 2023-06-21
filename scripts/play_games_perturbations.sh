@@ -9,7 +9,8 @@ wandb=1  # Set wandb on (1) or off (0)
 
 num_eval_episodes=10
 
-perturbations=("substitute" "simplify" "shuffle" "paraphrasing")
+# perturbations=("substitute" "simplify" "shuffle" "paraphrasing")
+perturbations=("paraphrasing")
 
 # run_ids=("agent_weights/qoln6itk/")
 

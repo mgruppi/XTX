@@ -40,7 +40,7 @@ from utils.env import JerichoEnv
 from utils.vec_env import VecEnv
 from utils import logger
 from utils.memory import State, Transition
-from utils.perturbations import Synset, Paraphraser, Simplifier, Shuffler
+from utils.perturbations import Synset, BARTParaphraser, Simplifier, Shuffler
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -511,7 +511,7 @@ def main():
             entities = {obj.name for obj in eval_env.env.get_world_objects()}
             apply = Synset(entities=entities)
         elif args.perturbation == "paraphrasing":
-            apply = Paraphraser()
+            apply = BARTParaphraser()
         elif args.perturbation == "simplify":
             apply = Simplifier()
         else:

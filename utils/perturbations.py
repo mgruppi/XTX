@@ -1,4 +1,4 @@
-from transformers import T5Tokenizer, T5ForConditionalGeneration
+from transformers import T5Tokenizer, T5ForConditionalGeneration, BartForConditionalGeneration, BartTokenizer
 import torch
 from nltk.corpus import wordnet
 import os
@@ -92,6 +92,36 @@ class Summarizer():
             texts(list) : The list of decoded strings.
         """
         return self.tokenizer.batch_decode(token_id_sequences, skip_special_tokens=True)
+
+
+class BARTParaphraser():
+    def __init__(self, device="cpu"):
+        """
+        Init the BART paraphraser model
+        """
+
+        self.model = BartForConditionalGeneration.from_pretrained("eugenesiow/bart-paraphrase")
+        self.tokenizer = BartTokenizer.from_pretrained("eugenesiow/bart-paraphrase")
+        self.device = device
+        self.model.to(device)
+    
+    def generate(self, inputs):
+        """
+        Generate paraphrasing of input sentences.
+
+        Args:
+            inputs (list[str]) : Batch inputs
+        
+        Returns:
+            outputs (list[str]) : Paraphrased sentences
+        """
+
+        batch = self.tokenizer(inputs, return_tensors='pt', padding=True, truncation=True)
+
+        generated_ids = self.model.generate(batch['input_ids'])
+        outputs = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
+
+        return outputs
 
 
 class Paraphraser():
@@ -377,7 +407,8 @@ class Synset:
 if __name__ == "__main__":
     # Test
 
-    inputs = ["This is a sentence in English.", "I like cheese very much"]
+    inputs = ["This is a sentence in English.", "I like cheese very much", 
+              "They were there to enjoy us and they were there to pray for us."]
 
     # summa = Summarizer()
     # print("Inputs", inputs)
@@ -403,3 +434,6 @@ if __name__ == "__main__":
 
     print("SHUFFLED", shuffler.generate(inputs))
     print("SIMPLIFIED", simplifier.generate(inputs))
+
+    bart = BARTParaphraser()
+    print("BART", bart.generate(inputs))
