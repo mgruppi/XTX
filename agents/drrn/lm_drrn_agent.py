@@ -21,6 +21,7 @@ from utils.env import JerichoEnv
 
 from utils.sentence_transformers import Tokenizer as SentenceTokenizer
 from utils.sentence_transformers import Encoder as SentenceEncoder
+from utils.sentence_transformers import LoRAEncoder
 
 import utils.ngram as Ngram
 
@@ -38,13 +39,17 @@ class LMDrrnAgent:
         envs: List[JerichoEnv],
         action_models,
         model_name : str = 'sentence-transformers/all-distilroberta-v1',
+        use_lora : bool = False
     ):
         self.gamma = args.gamma
         self.batch_size = args.batch_size
         # self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.tokenizer = SentenceTokenizer(model_name, device, as_list=True)
-        self.text_encoder = SentenceEncoder(model_name, device, output_encoding='tokens', vocab_size=len(self.tokenizer))
-        
+        if not use_lora:
+            self.text_encoder = SentenceEncoder(model_name, device, output_encoding='tokens', vocab_size=len(self.tokenizer))
+        else:
+            self.text_encoder = LoRAEncoder(model_name, device, output_encoding="tokens", vocab_size=len)
+
         # Get embedding size from LM
         x_tmp = self.text_encoder(torch.Tensor([self.tokenizer.encode('test')]).long().to(device))
         emb_size = x_tmp.shape[-1]

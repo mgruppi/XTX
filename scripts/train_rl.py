@@ -89,6 +89,10 @@ def parse_args():
     parser.add_argument('--check_valid_actions_changed', default=0, type=int)
 
     # Training Settings
+
+    # Use LoRA
+    parser.add_argument("--use_lora", action="store_true", help="Use LoRA")
+
     parser.add_argument('--env_step_limit', default=100, type=int)
     parser.add_argument('--dynamic_episode_length', default=0, type=int)
     parser.add_argument('--episode_ext_type', default='steady_50', type=str)
@@ -296,8 +300,12 @@ def main():
         trainer = LMActorCriticTrainer(tb, log, agent, envs, eval_env, args)
     
     elif args.model_name == defs.LM_DRRN:
+        if args.use_lora:
+            model_name = "roberta-base"
+        else:
+            model_name = "sentence-transformers/all-distilroberta-v1"
         envs = VecEnv(args.num_envs, eval_env)
-        agent = LMDrrnAgent(tb, log, args, envs, None)
+        agent = LMDrrnAgent(tb, log, args, envs, None, model_name=model_name, use_lora=args.use_lora)
         trainer = DrrnTrainer(tb, log, agent, envs, eval_env, args)
         
     elif args.model_name == defs.LM_XTX:
