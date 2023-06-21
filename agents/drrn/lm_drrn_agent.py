@@ -197,8 +197,7 @@ class LMDrrnAgent:
             )
         """
         # Idxs: indices of the sampled (from the Q-vals) actions
-        with torch.no_grad():
-            idxs, qvals = self.network.act(states, poss_acts, poss_act_strs)
+        idxs, qvals = self.network.act(states, poss_acts, poss_act_strs)
 
         # Get the sampled action for each environment
         act_ids = [poss_acts[batch][idx] for batch, idx in enumerate(idxs)]

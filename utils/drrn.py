@@ -176,7 +176,8 @@ def packed_rnn(model, x, rnn):
     x_tt = x_tt.index_select(0, idx_sort)
 
     # Run the embedding layer
-    embed = model.embedding(x_tt).permute(1, 0, 2)  # Time x Batch x EncDim
+    with torch.no_grad():
+        embed = model.embedding(x_tt).permute(1, 0, 2)  # Time x Batch x EncDim
 
     # Pack padded batch of sequences for RNN module
     packed = nn.utils.rnn.pack_padded_sequence(embed, lengths.cpu())
