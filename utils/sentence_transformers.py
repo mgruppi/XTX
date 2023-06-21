@@ -264,7 +264,7 @@ class LoRAEncoder(Encoder):
         Initializes Low-Rank Adaptation Encoder
         """
 
-        super().__init__(model_name, device, **kwargs)
+        super().__init__(model_name, device, compute_gradients=True, **kwargs)
 
         config = LoraConfig(
             r=8,
@@ -276,7 +276,7 @@ class LoRAEncoder(Encoder):
         )
 
         self.model = get_peft_model(self.model, config)
-        self.model.train()
+        # self.model.train()
 
     def encode(self, encoding):
         """
@@ -331,8 +331,6 @@ if __name__ == "__main__":
     # tokens = torch.Tensor([tokens]).long()
     print("tk", tokens.shape)
     x = encoder.model(tokens)
-    print(x)
-    print(x[0].shape[-1])
 
     # encodings = tokenizer.encode(sentences)
     # embeddings = encoder.encode(encodings)
