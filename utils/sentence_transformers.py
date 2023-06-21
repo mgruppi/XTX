@@ -338,6 +338,9 @@ if __name__ == "__main__":
         print(x)
         print("data", len(data))
 
+        if len(data) > 100:
+            data = list()
+
     # encodings = tokenizer.encode(sentences)
     # embeddings = encoder.encode(encodings)
 
