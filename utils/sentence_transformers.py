@@ -1,4 +1,5 @@
 from transformers import AutoTokenizer, AutoModel
+from peft import LoraConfig, get_peft_model
 import torch
 import numpy as np
 import typing
@@ -89,7 +90,7 @@ class Tokenizer():
     
     def __len__(self):
         return len(self.model)
-        
+
 
 class Encoder():
     def __init__(self, model_name, device, compute_gradients=False, output_encoding='sentence',
@@ -257,6 +258,47 @@ class SentenceEncoder():
         return output
 
 
+class LoRAEncoder(Encoder):
+    def __init__(self, model_name, device, **kwargs):
+        """
+        Initializes Low-Rank Adaptation Encoder
+        """
+
+        super().__init__(model_name, device, **kwargs)
+
+        config = LoraConfig(
+            r=32,
+            lora_alpha=32,
+            target_modules=["query", "value"],
+            lora_dropout=0.1,
+            bias="lora_only",
+            modules_to_save=["decode_head"]
+        )
+
+        self.lora_model = get_peft_model(self.model, config)
+
+    def encode(self, encoding):
+        """
+        Override the superclass encode function to avoid using `torch.no_grad`.
+        """
+        return self.output_func(self.model(encoding))
+
+    def print_trainable_parameters(self):
+        """
+        Prints the number of trainable parameters in the model.
+        """
+        trainable_params = 0
+        all_param = 0
+        for _, param in self.model.named_parameters():
+            all_param += param.numel()
+            if param.requires_grad:
+                trainable_params += param.numel()
+        
+        print(
+            f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
+        )
+
+
 if __name__ == "__main__":
     sentences = [
                 "You see a table. There is an apple on the table.",
@@ -270,17 +312,25 @@ if __name__ == "__main__":
                 ]
     batched_sequences = [ sentences, sentences, sentences]
 
-    tokenizer = Tokenizer(model_name='sentence-transformers/all-distilroberta-v1', device='cpu')
-    encoder = Encoder(model_name='sentence-transformers/all-distilroberta-v1', device='cpu')
+    model_name = "roberta-base"
 
-    tokens = tokenizer.encode(sentences[0])
+    tokenizer = Tokenizer(model_name, "cpu")
+    encoder = LoRAEncoder(model_name, "cpu")
+
+    encoder.print_trainable_parameters()
+
+    # tokenizer = Tokenizer(model_name='sentence-transformers/all-distilroberta-v1', device='cpu')
+    # encoder = Encoder(model_name='sentence-transformers/all-distilroberta-v1', device='cpu')
+
+    tokens = tokenizer.encode(sentences[0])['input_ids']
 
     print(tokens)
-    print(tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(tokens)))
+    # print(tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(tokens)))
     
-    tokens = torch.Tensor([tokens]).long()
+    # tokens = torch.Tensor([tokens]).long()
     print("tk", tokens.shape)
     x = encoder.model(tokens)
+    print(x)
     print(x[0].shape[-1])
 
     # encodings = tokenizer.encode(sentences)
