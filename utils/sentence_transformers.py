@@ -323,14 +323,20 @@ if __name__ == "__main__":
     # tokenizer = Tokenizer(model_name='sentence-transformers/all-distilroberta-v1', device='cpu')
     # encoder = Encoder(model_name='sentence-transformers/all-distilroberta-v1', device='cpu')
 
-    tokens = tokenizer.encode(sentences[0])['input_ids']
+    data = list()
+    while True:
 
-    print(tokens)
-    # print(tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(tokens)))
-    
-    # tokens = torch.Tensor([tokens]).long()
-    print("tk", tokens.shape)
-    x = encoder.model(tokens)
+        tokens = tokenizer.encode(sentences[0])['input_ids']
+
+        print(tokens)
+        # print(tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(tokens)))
+        
+        # tokens = torch.Tensor([tokens]).long()
+        print("tk", tokens.shape)
+        x = encoder.model(tokens)
+        data.append(x)
+        print(x)
+        print("data", len(data))
 
     # encodings = tokenizer.encode(sentences)
     # embeddings = encoder.encode(encodings)
