@@ -289,7 +289,7 @@ class LMDrrnAgent:
             torch.save(self.network.state_dict(),
                        pjoin(wandb.run.dir, 'weights_{}.pt'.format(step)))
 
-            if type(self.text_encoder) == LoRAEncoder:
+            if self.use_lora:
                 self.text_encoder.save_pretrained(wandb.run.dir, 'lora')
 
             if traj is not None:
