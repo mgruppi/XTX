@@ -1,5 +1,5 @@
 from transformers import AutoTokenizer, AutoModel
-from peft import LoraConfig, get_peft_model
+from peft import LoraConfig, get_peft_model, set_peft_model_state_dict
 import torch
 import numpy as np
 import typing
@@ -136,6 +136,9 @@ class Encoder():
                     return self.output_func(model_output, encoding['attention_mask'])
             else:
                 return self.output_func(self.model(encoding))
+
+    def save(self, path):
+        raise NotImplementedError
 
     def __call__(self, input):
         """
@@ -298,6 +301,23 @@ class LoRAEncoder(Encoder):
         print(
             f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
         )
+    
+    def save(self, path):
+        """
+        Save model to path
+        """
+
+        print(path)
+        print(self.model.lora_state_dict)
+        self.model.save_pretrained(path)
+
+    def load(self, path):
+        """
+        Load PEFT model
+        """
+
+        state_dict = torch.load(path, map_location=self.device)
+        set_peft_model_state_dict(self.model, state_dict)
 
 
 if __name__ == "__main__":
@@ -335,11 +355,12 @@ if __name__ == "__main__":
         print("tk", tokens.shape)
         x = encoder.model(tokens)
         data.append(x)
-        print(x)
-        print("data", len(data))
+        # print(x)
+        # print("data", len(data))
 
         if len(data) > 100:
             data = list()
+            encoder.save("lora")
 
     # encodings = tokenizer.encode(sentences)
     # embeddings = encoder.encode(encodings)
